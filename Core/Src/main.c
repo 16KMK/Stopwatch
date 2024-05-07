@@ -51,6 +51,7 @@ uint8_t HH = 00;
 uint8_t MM = 00;
 uint8_t SS = 00;
 uint8_t MS = 00;
+uint8_t x;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -107,39 +108,56 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-//Key_1 for Start
-		if (Keypad_Matrix_ReadKey(&matrix1, 1)) {
+//Key_0 for Start
+		if (Keypad_Matrix_ReadKey(&matrix1, 0)) {
+			x = 0;
+		}
+		if (x == 0) {
 			HAL_Delay(100);
-			SS++;
+			MS++;
 
-			if (SS == 60) {
-				MM++;
-				SS = 0;
+			if (MS == 10) {
+				SS++;
+				MS = 0;
 			}
 
-			if (MM == 59 && SS == 60) {
+			if (SS == 59 && MS == 10) {
+				MM++;
+				MS = 0;
+				SS = 0;
+
+			}
+			if (MM == 59 && SS == 59 && MS == 10) {
 				HH++;
+				MS = 0;
 				MM = 0;
 				SS = 0;
 			}
 
-			if (HH == 23 && MM == 59 && SS == 60) {
+			if (HH == 23 && MM == 59 && SS == 59 && MS == 10) {
 				HH = 0;
 				MM = 0;
 				SS = 0;
+				MS = 0;
 			}
 			uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS,
 					MS);
 			Alcd_PutAt_n(&lcd1, 0, 0, str, length);
 		}
-		//Key_2 for stop
-		if (Keypad_Matrix_ReadKey(&matrix1, 2)) {
+		//Key_1 for stop
+		if (Keypad_Matrix_ReadKey(&matrix1, 1)) {
+			x = 1;
+		}
+		if (x == 1) {
 			uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS,
 					MS);
 			Alcd_PutAt_n(&lcd1, 0, 0, str, length);
 		}
-		//Key_3 for clear
-		if (Keypad_Matrix_ReadKey(&matrix1, 3)) {
+		//Key_2 for clear
+		if (Keypad_Matrix_ReadKey(&matrix1, 2)) {
+			x = 2;
+		}
+		if (x == 2) {
 			Alcd_Clear(&lcd1);
 		}
 		/* USER CODE END WHILE */
