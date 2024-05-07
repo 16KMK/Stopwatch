@@ -50,6 +50,7 @@ char str[16];
 uint8_t HH = 00;
 uint8_t MM = 00;
 uint8_t SS = 00;
+uint8_t MS = 00;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -94,34 +95,55 @@ int main(void) {
 
 	/* USER CODE BEGIN 2 */
 	Alcd_Init(&lcd1, 2, 16);
+	__HAL_RCC_GPIOB_CLK_ENABLE();
 	Keypad_Matrix_init(&matrix1);
+	GPIO_InitTypeDef FGC = { .Mode = GPIO_MODE_OUTPUT_PP, // Output Push Pull Mode
+			.Speed = GPIO_SPEED_LOW, .Pin = GPIO_PIN_13 };
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	HAL_GPIO_Init(GPIOC, &FGC);
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+//Key_1 for Start
+		if (Keypad_Matrix_ReadKey(&matrix1, 1)) {
+			HAL_Delay(100);
+			SS++;
+
+			if (SS == 60) {
+				MM++;
+				SS = 0;
+			}
+
+			if (MM == 59 && SS == 60) {
+				HH++;
+				MM = 0;
+				SS = 0;
+			}
+
+			if (HH == 23 && MM == 59 && SS == 60) {
+				HH = 0;
+				MM = 0;
+				SS = 0;
+			}
+			uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS,
+					MS);
+			Alcd_PutAt_n(&lcd1, 0, 0, str, length);
+		}
+		//Key_2 for stop
+		if (Keypad_Matrix_ReadKey(&matrix1, 2)) {
+			uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS,
+					MS);
+			Alcd_PutAt_n(&lcd1, 0, 0, str, length);
+		}
+		//Key_3 for clear
+		if (Keypad_Matrix_ReadKey(&matrix1, 3)) {
+			Alcd_Clear(&lcd1);
+		}
 		/* USER CODE END WHILE */
-		HAL_Delay(1000);
-		SS++;
 
-		if (SS == 60) {
-			MM++;
-			SS = 0;
-		}
-
-		if (MM == 59 && SS == 60) {
-			HH++;
-			MM = 0;
-			SS = 0;
-		}
-
-		if (HH == 23 && MM == 59 && SS == 60) {
-			HH = 0;
-			MM = 0;
-			SS = 0;
-		}
-		uint8_t length = sprintf(str, "%02d:%02d:%02d", HH, MM, SS);
-		Alcd_PutAt_n(&lcd1, 0, 0, str, length);
 		/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */
