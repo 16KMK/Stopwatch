@@ -45,6 +45,8 @@ Keypad_Matrix_t matrix1 = { .Row_Port = GPIOB, .Row_Start_Pin = 12,
 		.Column_Port = GPIOB, .Column_Start_Pin = 6, .Rows = 4, .Columns = 4 };
 Alcd_t lcd1 = { .Data_GPIO = GPIOA, .Data_GPIO_Start_Pin = 0, .RS_GPIO = GPIOA,
 		.RS_GPIO_Pin = GPIO_PIN_4, .EN_GPIO = GPIOA, .EN_GPIO_Pin = GPIO_PIN_5 };
+GPIO_InitTypeDef FGC = { .Mode = GPIO_MODE_OUTPUT_PP, .Speed = GPIO_SPEED_LOW,
+		.Pin = GPIO_PIN_13 };
 char str[16];
 uint8_t HH = 00;
 uint8_t MM = 00;
@@ -94,83 +96,78 @@ int main(void) {
 	MX_GPIO_Init();
 
 	/* USER CODE BEGIN 2 */
-	Alcd_Init(&lcd1, 2, 16);
+	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
+	Alcd_Init(&lcd1, 2, 16);
 	Keypad_Matrix_init(&matrix1);
-	GPIO_InitTypeDef FGC = { .Mode = GPIO_MODE_OUTPUT_PP, // Output Push Pull Mode
-			.Speed = GPIO_SPEED_LOW, .Pin = GPIO_PIN_13 };
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-	HAL_GPIO_Init(GPIOC, &FGC);
 
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+		Keypad_Matrix_Refresh(&matrix1);
 		//Key_0 for Start
 		if (Keypad_Matrix_ReadKey(&matrix1, 0)) {
 			x = 0;
-			if (x == 0) {
-				HAL_Delay(100);
-				MS++;
+		}
 
-				if (MS == 10) {
-					SS++;
-					MS = 0;
-				}
+		//Key_1 for stop
+		else if (Keypad_Matrix_ReadKey(&matrix1, 1)) {
+			x = 1;
+		}
 
-				if (SS == 59 && MS == 10)
-					;
-				{
-					MM++;
-					MS = 0;
-					SS = 0;
+		//Key_2 for clear
+		else if (Keypad_Matrix_ReadKey(&matrix1, 2)) {
+			x = 2;
+		}
 
-				}
-				if (MM == 59 && SS == 59 && MS == 10)
-					;
-				{
-					HH++;
-					MS = 0;
-					MM = 0;
-					SS = 0;
-				}
+		if (x == 0) {
+			HAL_Delay(100);
+			MS++;
+			if (MS == 10) {
+				SS++;
+				MS = 0;
+			}
+
+			if (SS == 59 && MS == 10)
+
+			{
+				MM++;
+				MS = 0;
+				SS = 0;
+			}
+			if (MM == 59 && SS == 59 && MS == 10)
+
+			{
+				HH++;
+				MS = 0;
+				MM = 0;
+				SS = 0;
 			} else/*(HH == 23 && MM == 59 && SS == 59 && MS == 10)*/{
 				HH = 0;
 				MM = 0;
 				SS = 0;
 				MS = 0;
-			}
-			uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS,
-					MS);
-			Alcd_PutAt_n(&lcd1, 0, 0, str, length);
-		}
-		//Key_1 for stop
-		if (Keypad_Matrix_ReadKey(&matrix1, 1))
-			;
-		{
-			x = 1;
-			if (x == 1) {
 				uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS,
 						MS);
 				Alcd_PutAt_n(&lcd1, 0, 0, str, length);
-			}
-		}
 
-		//Key_2 for clear
-		if (Keypad_Matrix_ReadKey(&matrix1, 2))
-			;
+			}
+		} else if (x == 1) {
+			uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS,
+					MS);
+			Alcd_PutAt_n(&lcd1, 0, 0, str, length);
+		} else if (x == 2)
+
 		{
-			x = 2;
-			if (x == 2)
-				;
-			{
-				Alcd_Clear(&lcd1);
-			}
+			HH = 0;
+			MM = 0;
+			SS = 0;
+			MS = 0;
 		}
+		/* USER CODE END WHILE */
 	}
-	/* USER CODE END WHILE */
-
 	/* USER CODE BEGIN 3 */
 }
 /* USER CODE END 3 */
