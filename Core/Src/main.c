@@ -42,8 +42,7 @@
 
 /* USER CODE BEGIN PV */
 Keypad_Matrix_t matrix1 = { .Row_Port = GPIOB, .Row_Start_Pin = 12,
-		.Column_Port =
-		GPIOB, .Column_Start_Pin = 6, .Rows = 4, .Columns = 4 };
+		.Column_Port = GPIOB, .Column_Start_Pin = 6, .Rows = 4, .Columns = 4 };
 Alcd_t lcd1 = { .Data_GPIO = GPIOA, .Data_GPIO_Start_Pin = 0, .RS_GPIO = GPIOA,
 		.RS_GPIO_Pin = GPIO_PIN_4, .EN_GPIO = GPIOA, .EN_GPIO_Pin = GPIO_PIN_5 };
 char str[16];
@@ -108,33 +107,35 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-//Key_0 for Start
+		//Key_0 for Start
 		if (Keypad_Matrix_ReadKey(&matrix1, 0)) {
 			x = 0;
-		}
-		if (x == 0) {
-			HAL_Delay(100);
-			MS++;
+			if (x == 0) {
+				HAL_Delay(100);
+				MS++;
 
-			if (MS == 10) {
-				SS++;
-				MS = 0;
-			}
+				if (MS == 10) {
+					SS++;
+					MS = 0;
+				}
 
-			if (SS == 59 && MS == 10) {
-				MM++;
-				MS = 0;
-				SS = 0;
+				if (SS == 59 && MS == 10)
+					;
+				{
+					MM++;
+					MS = 0;
+					SS = 0;
 
-			}
-			if (MM == 59 && SS == 59 && MS == 10) {
-				HH++;
-				MS = 0;
-				MM = 0;
-				SS = 0;
-			}
-
-			if (HH == 23 && MM == 59 && SS == 59 && MS == 10) {
+				}
+				if (MM == 59 && SS == 59 && MS == 10)
+					;
+				{
+					HH++;
+					MS = 0;
+					MM = 0;
+					SS = 0;
+				}
+			} else/*(HH == 23 && MM == 59 && SS == 59 && MS == 10)*/{
 				HH = 0;
 				MM = 0;
 				SS = 0;
@@ -145,27 +146,34 @@ int main(void) {
 			Alcd_PutAt_n(&lcd1, 0, 0, str, length);
 		}
 		//Key_1 for stop
-		if (Keypad_Matrix_ReadKey(&matrix1, 1)) {
+		if (Keypad_Matrix_ReadKey(&matrix1, 1))
+			;
+		{
 			x = 1;
+			if (x == 1) {
+				uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS,
+						MS);
+				Alcd_PutAt_n(&lcd1, 0, 0, str, length);
+			}
 		}
-		if (x == 1) {
-			uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS,
-					MS);
-			Alcd_PutAt_n(&lcd1, 0, 0, str, length);
-		}
-		//Key_2 for clear
-		if (Keypad_Matrix_ReadKey(&matrix1, 2)) {
-			x = 2;
-		}
-		if (x == 2) {
-			Alcd_Clear(&lcd1);
-		}
-		/* USER CODE END WHILE */
 
-		/* USER CODE BEGIN 3 */
+		//Key_2 for clear
+		if (Keypad_Matrix_ReadKey(&matrix1, 2))
+			;
+		{
+			x = 2;
+			if (x == 2)
+				;
+			{
+				Alcd_Clear(&lcd1);
+			}
+		}
 	}
-	/* USER CODE END 3 */
+	/* USER CODE END WHILE */
+
+	/* USER CODE BEGIN 3 */
 }
+/* USER CODE END 3 */
 
 /**
  * @brief System Clock Configuration
