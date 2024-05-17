@@ -121,43 +121,40 @@ int main(void) {
 		else if (Keypad_Matrix_ReadKey(&matrix1, 2)) {
 			x = 2;
 		}
-
-		if (x == 0) {
-			HAL_Delay(100);
+		HAL_Delay(100);
+		uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS, MS);
+		Alcd_PutAt_n(&lcd1, 0, 0, str, length);
+		if (x == 1) {
 			MS++;
 			if (MS == 10) {
 				SS++;
 				MS = 0;
 			}
 
-			if (SS == 59 && MS == 10)
+			if (SS == 59)
 
 			{
 				MM++;
 				MS = 0;
 				SS = 0;
 			}
-			if (MM == 59 && SS == 59 && MS == 10)
+			if (MM == 59)
 
 			{
 				HH++;
 				MS = 0;
 				MM = 0;
 				SS = 0;
-			} else/*(HH == 23 && MM == 59 && SS == 59 && MS == 10)*/{
+			} else if (HH == 23) {
 				HH = 0;
 				MM = 0;
 				SS = 0;
 				MS = 0;
-				uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS,
-						MS);
-				Alcd_PutAt_n(&lcd1, 0, 0, str, length);
 
 			}
+
 		} else if (x == 1) {
-			uint8_t length = sprintf(str, "%02d:%02d:%02d:%02d", HH, MM, SS,
-					MS);
-			Alcd_PutAt_n(&lcd1, 0, 0, str, length);
+
 		} else if (x == 2)
 
 		{
@@ -170,7 +167,7 @@ int main(void) {
 	}
 	/* USER CODE BEGIN 3 */
 }
-/* USER CODE END 3 */
+/* USER CODE END 3 */
 
 /**
  * @brief System Clock Configuration
